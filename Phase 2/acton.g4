@@ -141,7 +141,7 @@ assignStmt returns [Assign ass]
     ;
 
 assignment returns [Expression lVal, Expression rVal]
-    :   orExp=orExpression {$lVal = $orExp.orExpr;} ASSIGN ex=expression {$rVal = $ex.expr;}
+    :   orExp=orExpression {$lVal = $orExp.expr;} ASSIGN ex=expression {$rVal = $ex.expr;}
     ;
 
 forStmt returns [For for]
@@ -153,9 +153,9 @@ forStmt returns [For for]
     ;
 
 ifStmt returns [Conditional conditional]
-    :   IF LPAREN if=expression RPAREN then=statement
-        {$conditional = new Conditional($if.expr , $then.stmt);}
-        (else=elseStmt {if ($else.else != null){$$conditional.setElseBody($else.else);}} )
+    :   IF LPAREN i=expression RPAREN then=statement
+        {$conditional = new Conditional($i.expr , $then.stmt);}
+        (el=elseStmt {if ($el.else != null){$$conditional.setElseBody($el.else);}} )
     ;
 
 elseStmt returns [Statement else]
@@ -188,26 +188,26 @@ orExpression returns [Expression expr]
     ;
 
 andExpression returns [Expression expr]
-    :	exp1=equalityExpression {$expr=$exp1.exp;}
+    :	exp1=equalityExpression {$expr=$exp1.expr;}
         (and=AND exp2=equalityExpression {$expr = new BinaryExpression($exp1.expr, $exp2.expr, new BinaryOperator(and));} )*
     ;
 
 equalityExpression returns [Expression expr] locals [BinaryOperator binaryOperator]
-    :	exp1=relationalExpression {$expr=$exp1.exp;}
+    :	exp1=relationalExpression {$expr=$exp1.expr;}
         ( (eq=EQ {$binaryOperator = new BinaryOperator(eq); } | neq=NEQ {$binaryOperator = new BinaryOperator(neq); })
          exp2=relationalExpression {$expr = new BinaryExpression($exp1.expr, $exp2.expr, $binaryOperator);} )*
     ;
 
 relationalExpression returns [Expression expr] locals [BinaryOperator binaryOperator]
-    : exp1=additiveExpression {$expr=$exp1.exp;}
+    : exp1=additiveExpression {$expr=$exp1.expr;}
      ((LT {$binaryOperator = new BinaryOperator(lt);} | GT {$binaryOperator = new BinaryOperator(gt);})
       exp2=additiveExpression {$expr = new BinaryExpression($exp1.expr, $exp2.expr, $binaryOperator );} )*
     ;
 
 additiveExpression returns [Expression expr] locals [BinaryOperator binaryOperator]
-    : exp1=multiplicativeExpression {$expr=$exp1.exp;}
+    : exp1=multiplicativeExpression {$expr=$exp1.expr;}
     ((PLUS {$binaryOperator = new BinaryOperator(add);} | MINUS {$binaryOperator = new BinaryOperator(sub);})
-    expr2=multiplicativeExpression {$expr = new BinaryExpression($exp1.expr, $exp2.expr, $binaryOperator);} )*
+    exp2=multiplicativeExpression {$expr = new BinaryExpression($exp1.expr, $exp2.expr, $binaryOperator);} )*
     ;
 
 multiplicativeExpression returns [Expression expr] locals [BinaryOperator binaryOperator]
@@ -264,7 +264,7 @@ identifier returns [Identifier id]
     ;
 
 value returns [Value val]
-    :   int=INTVAL {$val = new IntValue(Integer.parseInt($int.text), new IntType());} |
+    :   i=INTVAL {$val = new IntValue(Integer.parseInt($i.text), new IntType());} |
         str=STRINGVAL {$val = new StringValue($str.text, new StringType());} |
         tr=TRUE {$val = new BooleanValue(true, new BooleanType());} |
         fal=FALSE {$val = new BooleanValue(false, new BooleanType());}
