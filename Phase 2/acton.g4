@@ -35,8 +35,10 @@ grammar acton;
     }
 }
 
-program
-    : (actorDeclaration)+ mainDeclaration
+program returns [Program pro]
+    : {$pro = new Program();}
+      (ad=actorDeclaration {$pro.addActor($ad.actor);})+
+      md=mainDeclaration {$pro.setMain($md.main);}
     ;
 
 actorDeclaration returns [ActorDeclaration actor]
@@ -66,17 +68,18 @@ actorDeclaration returns [ActorDeclaration actor]
         RBRACE
     ;
 
-mainDeclaration
-    :   MAIN
+mainDeclaration returns [Main main]
+    :   MAIN {$main = new Main();}
     	LBRACE
-        actorInstantiation*
+        (ac=actorInstantiation {$main.addActorInstantiation($ac.actor);} )*
     	RBRACE
     ;
 
-actorInstantiation
-    :	identifier identifier
-     	LPAREN (identifier(COMMA identifier)* | ) RPAREN
-     	COLON LPAREN expressionList RPAREN SEMICOLON
+actorInstantiation returns [ActorInstantiation actor]
+    :	iid1=identifier iid2=identifier
+        {$actor = new ActorInstantiation(new ActorType($iid1.id), $iid2.id);}
+     	LPAREN (k1=identifier {$actor.addKnownActor($k1.id);} (COMMA k2=identifier{$actor.addKnownActor($k2.id);})* | ) RPAREN
+     	COLON LPAREN exList=expressionList {$actor.setInitArgs($exList.expList);} RPAREN SEMICOLON
     ;
 
 initHandlerDeclaration returns [InitHandlerDeclaration initMsgHandler]
@@ -89,18 +92,20 @@ initHandlerDeclaration returns [InitHandlerDeclaration initMsgHandler]
      	RBRACE
     ;
 
-msgHandlerDeclaration returns [MsgHandlerDeclaration msgHandlerDec]
+msgHandlerDeclaration returns [HandlerDeclaration msgHandlerDec]
     :	MSGHANDLER i=identifier
         {$msgHandlerDec = new MsgHandlerDeclaration($i.id);}
-        LPAREN argDeclarations RPAREN
+        LPAREN ar=argDeclarations {$msgHandlerDec.setArgs($ar.args);} RPAREN
        	LBRACE
-       	varDeclarations
-       	(statement)*
+       	v=varDeclarations {$msgHandlerDec.setLocalVars($v.vars);}
+       	(s=statement {$msgHandlerDec.addStatement($s.stmt);} )*
        	RBRACE
     ;
 
-argDeclarations
-    :	varDeclaration(COMMA varDeclaration)* |
+argDeclarations returns [ArrayList<VarDeclaration> args]
+    :	{$args = new ArrayList<VarDeclaration>();}
+        v1=varDeclaration {$args.add(v1.var);}
+        (COMMA v2=varDeclaration {$args.add(v2.var);})* |
     ;
 
 varDeclarations returns [ArrayList<VarDeclaration> vars]
