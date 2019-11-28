@@ -18,9 +18,6 @@ grammar acton;
 }
 
 @members{
-    void print(String str){
-        System.out.println(str);
-    }
 
     void beginScope(){
         SymbolTable.push(new SymbolTable());
@@ -31,6 +28,7 @@ grammar acton;
     }
 }
 
+//TODO: fix lining
 program returns [Program pro]
     : {$pro = new Program();}
       (ad=actorDeclaration {$pro.addActor($ad.actor);})+
@@ -141,7 +139,7 @@ printStmt returns [Print print]
     ;
 
 assignStmt returns [Statment ass]
-    :    assign=assignment {$ass = $assing.ass;} semi=SEMICOLON {$ass.setLine($semi.line);}
+    :    assign=assignment {$ass = $assign.ass;} semi=SEMICOLON {$ass.setLine($semi.line);}
     ;
 
 assignment returns [Assign ass]
@@ -212,7 +210,7 @@ equalityExpression returns [Expression expr] locals [BinaryOperator binaryOperat
 relationalExpression returns [Expression expr] locals [BinaryOperator binaryOperator, int line]
     : exp1=additiveExpression {$expr=$exp1.expr;}
      ((lt=LT {$binaryOperator = new BinaryOperator(lt); $line=$lt.line;} |
-      gt=GT {$binaryOperator = new BinaryOperator(gt); $line=$git.line;})
+      gt=GT {$binaryOperator = new BinaryOperator(gt); $line=$gt.line;})
       exp2=additiveExpression {$expr = new BinaryExpression($exp1.expr, $exp2.expr, $binaryOperator ); $expr.setLine($line); } )*
     ;
 
