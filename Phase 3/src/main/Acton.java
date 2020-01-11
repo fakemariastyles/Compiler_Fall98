@@ -24,17 +24,6 @@ public class Acton {
             nameAnalyser.visit(program);
             if (nameAnalyser.numOfErrors() > 0)
                 throw new CompileErrorException();
-
-            TypeAnalyser typeAnalyser = new TypeAnalyser();
-            typeAnalyser.visit(program);
-
-            Map<String, Integer> errors = typeAnalyser.getErrors();
-            Object[] a = errors.entrySet().toArray();
-            Arrays.sort(a, (Comparator<Object>) Comparator.comparing(o -> ((Map.Entry<String, Integer>) o).getValue()));
-
-            for (Object e : a) {
-                System.out.println(((Map.Entry<String, Integer>) e).getKey());
-            }
         } catch (CompileErrorException compileError) {
         }
     }

@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="antlr-4.7.2-complete">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/../Compiler/antlr-4.7.2-complete.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../Compiler/Jasmin-1.5.8.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
